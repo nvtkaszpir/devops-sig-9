@@ -1,0 +1,63 @@
+---
+# service
+apiVersion: v1
+kind: Service
+metadata:
+  name: etcd-operator
+  labels:
+    app: etcd-operator
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: 8080
+      protocol: TCP
+      name: etcd-operator
+  selector:
+    name: etcd-operator
+---
+# deployment attached to service
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: etcd-operator
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: etcd-operator
+    spec:
+      containers:
+      - name: etcd-operator
+        image: quay.io/coreos/etcd-operator:v0.9.4
+        command:
+        - etcd-operator
+        # Uncomment to act for resources in all namespaces. More information in doc/clusterwide.md
+        #- -cluster-wide
+        env:
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        ports:
+          - name: etcd-operator
+            containerPort: 8080
+            protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /metrics
+            port: 8080
+          timeoutSeconds: 5
+          periodSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          timeoutSeconds: 5
+          periodSeconds: 1
+---

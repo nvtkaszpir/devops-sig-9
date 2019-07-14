@@ -1,0 +1,24 @@
+---
+# direct dump of ServiceMonitor if using additional seciton
+# this means you do not have to use custom prometheus nor alter helm chart values file
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    # app: promop-prometheus
+    # chart: prometheus-operator-5.14.1
+    # heritage: Tiller
+    release: po # required
+  name: etcd-cluster-generic
+  namespace: default
+spec:
+  endpoints:
+  - interval: 10s
+    port: client
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      app: etcd
+      etcd_cluster: etcd

@@ -1,0 +1,57 @@
+# this crates dedicated prometheus instance for monitoring given app
+---
+# define servicemonitor which will select services with labels:
+# `app: etcd` and `etcd_cluster: etcd`
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: etcd-client-sm
+  labels:
+    team: etcd
+    app: etcd
+    etcd_cluster: etcd
+spec:
+  endpoints:
+  - path: /metrics
+    port: client # service uses this port for redirecting to pods
+  namespaceSelector:
+    matchNames:
+    - default # which namespace to process
+  selector:
+    matchLabels: # find pods (services?) which match those labels
+      app: etcd
+      etcd_cluster: etcd
+
+---
+# prometheus instance which will scrape etcd servicemontiors
+apiVersion: monitoring.coreos.com/v1
+kind: Prometheus
+metadata:
+  name: etcd
+spec:
+  serviceMonitorSelector:
+    matchLabels:
+      team: etcd
+  resources:
+    requests:
+      memory: 400Mi
+---
+# expose that prometheus instance
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-etcd
+spec:
+  type: ClusterIP
+  ports:
+  - name: prometheus-etcd
+    port: 9090
+    protocol: TCP
+    targetPort: web
+  selector:
+    prometheus: etcd
+
+---
+# grafana data sources to add:
+#   prometheus-etcd
+# grafana dashboards to import 3070
