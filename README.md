@@ -2,7 +2,9 @@
 
 ## About
 
-This allows to create prometheus instances on demand using k8s CRD.
+This repo can be used to get bare minimum with prometheus-operator on k8s.
+
+Notice: this is not ready for prodution.
 
 ## Steps
 
