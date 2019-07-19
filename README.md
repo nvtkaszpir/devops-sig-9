@@ -19,6 +19,8 @@ we can create customized prometheus instance to our needs.
 
 [Prometheus Operator - Getting started](https://github.com/coreos/prometheus-operator/blob/master/Documentation/user-guides/getting-started.md)
 
+[Custom metrics elements](https://github.com/coreos/prometheus-operator/blob/master/Documentation/custom-metrics-elements.png)
+
 ## 1. Base setup
 
 - get k8s cluster, for example may be used with KIND:
